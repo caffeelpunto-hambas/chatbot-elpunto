@@ -74,7 +74,7 @@ BEBIDAS
 FRAPPE: Grande 16oz $75 | Jumbo 24oz $89
 FRÍAS: Grande 16oz $60 | Jumbo 24oz $79
 CALIENTES: Chico 12oz $55 | Grande 16oz $70 | Jumbo 24oz $79
-CAFÉ DEL DÍA: Chico $30 | Grande $35 | Jumbo $40 | Refill $40
+CAFÉ DEL DÍA (Americano): Chico $30 | Grande $35 | Jumbo $40 | Refill $40
 Sabores: Regular, Oreo(+$10), Caramelo, Vainilla, Moka, Avellana, Crema Irlandesa, Chocolate Blanco, Americano Limón, Matcha(+$10), Lavanda, Ferrero/Nutella(+$15), Honey, Fresa, Frutos Rojos, Taro(+$10), Chai(+$15), Chai Vainilla(+$15), Tisana, Chai Sucio(+$20)
 Sugar Free: Vainilla SF(+$5), Caramelo SF(+$5), Kombucha, Chai SF(+$15)
 Otras: Jugo Naranja/Verde $40 | Malteada Fresa $60 | Malteada Chocolate $60
@@ -86,7 +86,7 @@ INSTRUCCIONES:
 2. Respuestas CORTAS (máx 5-7 líneas) — es WhatsApp.
 3. Al tomar pedido: confirma cada item con precio. Al terminar, pide nombre, dirección y teléfono.
 4. Al finalizar muestra RESUMEN con productos y TOTAL en pesos mexicanos.
-5. Avisa si piden fuera de horario.
+5. Avisa si piden fuera de horario (horario de 7 am a 10:30 pm).
 6. NO inventes precios ni productos.
 7. Dudas: da el teléfono 696.688.1944.`;
 
