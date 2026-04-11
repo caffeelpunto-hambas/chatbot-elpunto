@@ -107,7 +107,13 @@ app.post('/webhook', async (req, res) => {
     const message = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     console.log('MENSAJE COMPLETO:', JSON.stringify(req.body, null, 2));
 if (!message || message.type !== 'text') return;
-    const from = message.from;
+   let from = message.from;
+console.log('NÚMERO ORIGINAL:', from);
+// Normalizar número mexicano (521XXXXXXXXX → 52XXXXXXXXX)
+if (from.startsWith('521') && from.length === 13) {
+  from = '52' + from.slice(3);
+  console.log('NÚMERO NORMALIZADO:', from);
+}
     const text = message.text.body.trim();
     const phoneNumberId = req.body.entry[0].changes[0].value.metadata.phone_number_id;
     if (!conversations.has(from)) {
