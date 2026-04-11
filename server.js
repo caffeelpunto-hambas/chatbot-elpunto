@@ -6,42 +6,48 @@ const app = express();
 app.use(express.json());
 
 const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
+
+// MEMORIA
 const conversations = new Map();
+const pedidos = new Map();
 
 // LIMPIAR SESIONES
 setInterval(() => {
   const limite = Date.now() - 2 * 60 * 60 * 1000;
+
   for (const [key, val] of conversations.entries()) {
     if (val.lastActivity < limite) conversations.delete(key);
   }
+
+  for (const [id, pedido] of pedidos.entries()) {
+    if (pedido.timestamp < limite) pedidos.delete(id);
+  }
+
 }, 30 * 60 * 1000);
 
 // PROMPT DINÁMICO
 function getSystemPrompt(negocio) {
   return `Eres el asistente virtual de "${negocio}".
 
-Horario: 7:00 AM a 10:30 PM (todos los días)
-Servicio a domicilio disponible (+$30 pesos)
+Horario: 7:00 AM a 10:30 PM
+Servicio a domicilio: +$30 pesos
+
+Responde en español, breve y claro.
 
 Tu objetivo:
 - Mostrar menú
-- Resolver dudas
 - Tomar pedidos
 
-Reglas:
-- Responde en español
-- Sé breve (máx 5 líneas)
-- Usa emojis con moderación
-- NO inventes productos ni precios
-
 Al tomar pedido:
-- Confirma cada producto con precio
-- Al final muestra resumen + TOTAL
-- Agrega costo de envío ($30)
-- Pide nombre, dirección y teléfono`;
+- Confirma productos con precio
+- Muestra TOTAL
+- Incluye envío $30
+- Pide nombre, dirección y teléfono
+
+NO inventes productos ni precios.`;
 }
 
-// VERIFICACIÓN WEBHOOK
+// WEBHOOK VERIFY
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -50,10 +56,11 @@ app.get('/webhook', (req, res) => {
   if (mode === 'subscribe' && token === process.env.WEBHOOK_VERIFY_TOKEN) {
     return res.status(200).send(challenge);
   }
+
   return res.sendStatus(403);
 });
 
-// RECIBIR MENSAJES
+// WEBHOOK MENSAJES
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 
@@ -63,12 +70,47 @@ app.post('/webhook', async (req, res) => {
 
     let from = message.from;
 
-    // Normalizar número MX
+    // Normalizar MX
     if (from.startsWith('521') && from.length === 13) {
       from = '52' + from.slice(3);
     }
 
     const text = message.text.body.trim().toLowerCase();
+
+    // 🔥 MENSAJES DE COCINA
+    if (
+      from === process.env.CAFE_PHONE ||
+      from === process.env.HAMBAS_PHONE
+    ) {
+
+      const partes = text.split(' ');
+      const comando = partes[0];
+      const pedidoId = partes[1];
+
+      if (!pedidoId || !pedidos.has(pedidoId)) return;
+
+      const pedido = pedidos.get(pedidoId);
+
+      if (comando === 'confirmar') {
+        pedido.estado = 'confirmado';
+
+        await sendWhatsAppMessage(
+          pedido.cliente,
+          `✅ Tu pedido fue confirmado 👨‍🍳\n\nYa estamos preparándolo 🙌`
+        );
+      }
+
+      if (comando === 'listo') {
+        pedido.estado = 'listo';
+
+        await sendWhatsAppMessage(
+          pedido.cliente,
+          `🍔 Tu pedido está listo 😎\n\n¡Gracias por tu compra! 🙌`
+        );
+      }
+
+      return;
+    }
 
     // CREAR SESIÓN
     if (!conversations.has(from)) {
@@ -82,20 +124,18 @@ app.post('/webhook', async (req, res) => {
     const session = conversations.get(from);
     session.lastActivity = Date.now();
 
-    // 🔥 PASO 1: SELECCIÓN DE NEGOCIO
+    // 🔥 SELECCIÓN DE NEGOCIO
     if (!session.negocio) {
 
-      if (text.includes('cafe') || text.includes('punto') || text === '1') {
+      if (text.includes('cafe') || text === '1') {
         session.negocio = "Café El Punto";
-      } 
-      else if (text.includes('hambas') || text.includes('burger') || text === '2') {
+      } else if (text.includes('hambas') || text === '2') {
         session.negocio = "Hambas Urban Food";
-      } 
-      else {
+      } else {
         return await sendWhatsAppMessage(from,
 `👋 ¡Hola! Bienvenido 🙌
 
-¿En cuál deseas ordenar?
+¿Dónde deseas ordenar?
 
 1️⃣ Café El Punto ☕
 2️⃣ Hambas Urban Food 🍔
@@ -104,12 +144,12 @@ Responde con el número o nombre 👇`);
       }
 
       return await sendWhatsAppMessage(from,
-`✅ Perfecto, elegiste *${session.negocio}* 😎
+`✅ Elegiste *${session.negocio}* 😎
 
-¿Te muestro el menú o deseas ordenar algo?`);
+¿Te muestro el menú o deseas ordenar?`);
     }
 
-    // 🔥 PASO 2: IA YA CON NEGOCIO SELECCIONADO
+    // IA
     session.messages.push({ role: 'user', content: text });
 
     const response = await anthropic.messages.create({
@@ -128,6 +168,45 @@ Responde con el número o nombre 👇`);
     }
 
     await sendWhatsAppMessage(from, reply);
+
+    // 🔥 DETECTAR PEDIDO
+    if (esPedidoCompleto(reply)) {
+
+      const pedidoId = Date.now().toString();
+
+      pedidos.set(pedidoId, {
+        cliente: from,
+        negocio: session.negocio,
+        contenido: reply,
+        estado: 'pendiente',
+        timestamp: Date.now()
+      });
+
+      let destino = null;
+
+      if (session.negocio === "Café El Punto") {
+        destino = process.env.CAFE_PHONE;
+      }
+
+      if (session.negocio === "Hambas Urban Food") {
+        destino = process.env.HAMBAS_PHONE;
+      }
+
+      if (destino) {
+        const mensaje = `🔥 NUEVO PEDIDO #${pedidoId}
+
+Cliente: +${from}
+━━━━━━━━━━━━━━
+${reply}
+━━━━━━━━━━━━━━
+
+Responde:
+CONFIRMAR ${pedidoId}
+LISTO ${pedidoId}`;
+
+        await sendWhatsAppMessage(destino, mensaje);
+      }
+    }
 
   } catch (err) {
     console.error('ERROR:', err.message);
@@ -156,6 +235,12 @@ async function sendWhatsAppMessage(to, text) {
     console.error(await res.json());
     throw new Error('Error enviando mensaje');
   }
+}
+
+// DETECTAR PEDIDO
+function esPedidoCompleto(text) {
+  return ['total', 'pedido', 'resumen']
+    .some(p => text.toLowerCase().includes(p));
 }
 
 // ROOT
