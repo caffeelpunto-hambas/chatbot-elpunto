@@ -141,8 +141,28 @@ if (from.startsWith('521') && from.length === 13) {
   }
 });
 
-async function sendWhatsAppMessage(phoneNumberId, to, text) {
+async function enviarMensajeWhatsApp(a, texto) {
+
+  const phoneNumberId = process.env.PHONE_NUMBER_ID;
+
   const res = await fetch(`https://graph.facebook.com/v19.0/${phoneNumberId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to: a,
+      type: "text",
+      text: { body: texto }
+    })
+  });
+
+  if (!res.ok) {
+    throw new Error(`Error de la API Meta: ${JSON.stringify(await res.json())}`);
+  }
+}
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.META_ACCESS_TOKEN}`,
