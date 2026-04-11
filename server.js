@@ -105,7 +105,8 @@ app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
   try {
     const message = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-    if (!message || message.type !== 'text') return;
+    console.log('MENSAJE COMPLETO:', JSON.stringify(req.body, null, 2));
+if (!message || message.type !== 'text') return;
     const from = message.from;
     const text = message.text.body.trim();
     const phoneNumberId = req.body.entry[0].changes[0].value.metadata.phone_number_id;
