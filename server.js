@@ -10,7 +10,89 @@ const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
 // MEMORIA
 const conversations = new Map();
 const pedidos = new Map();
+const MENU_CAFE = `
+CAFÉ EL PUNTO
 
+DESAYUNOS:
+- Bowl de fruta — $89
+- Chilaquiles — $140 (pollo o 2 huevos)
+- Huevos al gusto — $139
+- Baguette El Punto — $135
+- Hotcakes — $130
+- Omelette — $165
+
+COMIDAS:
+- Pasta El Punto — $160
+- Lasagna — $195
+
+ENSALADAS:
+- Ensalada El Punto — $150
+- Ensalada Verano — $160
+
+PIZZAS:
+- Pepperoni — $160
+- Champiñón — $165
+- Carnívora — $190
+- Suprema — $190
+- Camarón — $230
+
+BEBIDAS:
+
+LATTE (fríos o calientes):
+- Chico — $60
+- Grande — $70
+- Jumbo — $79
+
+EXTRAS DE SABOR:
+- Chai (cualquier sabor) +$15
+- Chai sucio +$20
+- Matcha +$10
+- Taro +$10
+- Vainilla SF +$5
+- Caramelo SF +$5
+
+OTRAS BEBIDAS:
+- Frappes $75–$89
+- Café americano $30–$40
+- Limonadas $40–$45
+`;
+const MENU_HAMBAS = `
+HAMBAS URBAN FOOD
+
+HAMBURGUESAS:
+- Cheese Burger — $99
+- Hambas Burger — $109
+- Honey Burger — $119
+- BBQ Spicy — $119
+- Crispy Burger — $119
+- Korean Chicken — $129
+- Noro Burger — $149
+
+🔥 ESPECIALES:
+- Hamburguesa de carnitas + papas — $139
+- Papas de carnitas — $139
+- Mal del Puerco (res + carnitas) + papas — $180
+
+EXTRAS:
+- Carne extra +$30
+
+COMBOS:
+- Combo completo +$81 (papas + refresco + boneless)
+- Combo antojo +$51 (papas + boneless)
+
+BURRITOS:
+- Bacon Cheese — $99
+- Crispy Chicken — $119
+- Chicken Parmesano — $119
+- Burro Noro — $119
+
+POLLO:
+- Alitas — $139
+- Boneless — $149
+
+EXTRAS:
+- Papas — $21
+`;
 // LIMPIAR SESIONES
 setInterval(() => {
   const limite = Date.now() - 2 * 60 * 60 * 1000;
