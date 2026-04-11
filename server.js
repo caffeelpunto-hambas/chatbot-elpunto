@@ -55,6 +55,27 @@ OTRAS BEBIDAS:
 - Frappes $75–$89
 - Café americano $30–$40
 - Limonadas $40–$45
+- Refrescos $40
+
+Opciones de Sabores para bebidas sin costo extra (no aplica en cafe americano, limonadas o refrescos):
+- Caramelo
+- Vainilla
+- Moka
+- Chocolate Blanco
+- Avellana
+- Crema Irlandesa
+- Tisana
+- Tisana Golden
+- Honey
+- Regular
+- Lavanda
+- Fresa (Solo aplica en malteada y frappe)
+- Frutos Rojos (Solo aplica en malteada y frappe)
+
+Postres:
+- Rebanada de pastel $65
+- Galleta chispas $15
+- Pan Dulce $35
 `;
 const MENU_HAMBAS = `
 HAMBAS URBAN FOOD
