@@ -78,7 +78,7 @@ function getSystemPrompt(negocio) {
 
   const productosOtro = negocio === "Café El Punto"
     ? "hamburguesas, hambas burger, crispy burger, korean chicken, noro burger, bbq spicy, honey burger, cheese burger, burritos, alitas, boneless, mal del puerco, papas de carnitas, carnitas"
-    : "café, latte, frappe, capuchino, americano, pizza, chilaquiles, hotcakes, omelette, ensalada, pasta, lasagna, baguette, bowl de fruta, huevos, postre, pan dulce, galleta, pastel";
+    : "pizza, chilaquiles, hotcakes, omelette, ensalada, pasta, lasagna, baguette, bowl de fruta, huevos al gusto, nachos, postre, pan dulce, galleta, pastel, desayuno";
 
   return `
 Eres el asistente de ${negocio}.
