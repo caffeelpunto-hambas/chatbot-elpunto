@@ -70,24 +70,46 @@ function formatearMenu(negocio) {
 // PROMPT DINÁMICO
 function getSystemPrompt(negocio) {
   const menu = formatearMenu(negocio);
+
+  // Definir productos clave del otro restaurante para que Claude los reconozca
+  const otroRestaurante = negocio === "Café El Punto"
+    ? "Hambas Urban Food"
+    : "Café El Punto";
+
+  const productosOtro = negocio === "Café El Punto"
+    ? "hamburguesas, hambas burger, crispy burger, korean chicken, noro burger, bbq spicy, honey burger, cheese burger, burritos, alitas, boneless, mal del puerco, papas de carnitas, carnitas"
+    : "café, latte, frappe, capuchino, americano, pizza, chilaquiles, hotcakes, omelette, ensalada, pasta, lasagna, baguette, bowl de fruta, huevos, postre, pan dulce, galleta, pastel";
+
   return `
 Eres el asistente de ${negocio}.
 HORARIO:
 7:00 AM a 10:30 PM
 Domicilio: +$30
+
 MENÚ:
 ${menu}
+
 REGLAS:
 - Responde en español
 - Sé breve (máx 5 líneas)
-- No inventes productos
+- No inventes productos que no están en el menú de ${negocio}
 - Cuando describas un platillo, usa la descripción del menú para hacerlo sonar tentador
 - Si el cliente pregunta qué recomiendas, sugiere los platillos con descripción más atractiva
+
+OTRO RESTAURANTE DEL GRUPO:
+- El grupo también cuenta con *${otroRestaurante}*, que vende: ${productosOtro}.
+- Si el cliente pide algo que SOLO vende ${otroRestaurante} y que NO está en el menú de ${negocio}:
+  * Escribe [SWITCH:${otroRestaurante}] al inicio de tu respuesta (el sistema lo procesa, el cliente no lo ve)
+  * Si el cliente ya tiene productos en el pedido actual: dile amablemente que ese producto es de ${otroRestaurante}, que terminas de tomar su pedido actual y luego levantas uno allá
+  * Si el cliente aún no ha pedido nada: dile que ese producto es de ${otroRestaurante} y que con gusto lo pasas ahí
+- NUNCA digas que tienes productos que no están en tu menú
+
 VENTAS (IMPORTANTE):
 - Sugiere extras (carne, combos, bebidas)
 - Ofrece combos automáticamente
 - Recomienda productos relacionados
 - Siempre intenta cerrar la venta
+
 PEDIDOS:
 - Confirma cada producto con precio
 - Sugiere agregar combo o extras
@@ -95,9 +117,21 @@ PEDIDOS:
 - Agrega envío $30
 - Muestra TOTAL final
 - Pide nombre, dirección y teléfono
+
 OBJETIVO:
 Vender y aumentar el ticket promedio.
 `;
+}
+
+// DETECTAR MARCADOR DE CAMBIO DE RESTAURANTE
+function detectarSwitch(text) {
+  const match = text.match(/\[SWITCH:([^\]]+)\]/);
+  return match ? match[1].trim() : null;
+}
+
+// LIMPIAR MARCADORES INTERNOS ANTES DE ENVIAR AL CLIENTE
+function limpiarMarcadores(text) {
+  return text.replace(/\[SWITCH:[^\]]+\]/g, '').trim();
 }
 
 // LIMPIAR SESIONES VIEJAS
@@ -171,7 +205,8 @@ app.post('/webhook', async (req, res) => {
       conversations.set(from, {
         messages: [],
         lastActivity: Date.now(),
-        negocio: null
+        negocio: null,
+        pendingSwitch: null  // restaurante al que cambiará después del pedido actual
       });
     }
     const session = conversations.get(from);
@@ -211,18 +246,25 @@ Responde con el número o nombre 👇`);
           system: getSystemPrompt(session.negocio),
           messages: session.messages
         });
-        break; // éxito, salir del loop
+        break;
       } catch (err) {
         intentos++;
         if (err.status === 529 && intentos < maxIntentos) {
-          await new Promise(r => setTimeout(r, 2000 * intentos)); // espera 2s, 4s...
+          await new Promise(r => setTimeout(r, 2000 * intentos));
         } else {
           throw err;
         }
       }
     }
 
-    const reply = response.content[0].text;
+    const replyRaw = response.content[0].text;
+
+    // Detectar si Claude quiere hacer un cambio de restaurante
+    const switchTarget = detectarSwitch(replyRaw);
+
+    // Limpiar marcadores internos antes de enviar al cliente
+    const reply = limpiarMarcadores(replyRaw);
+
     session.messages.push({ role: 'assistant', content: reply });
 
     if (session.messages.length > 20) {
@@ -231,7 +273,25 @@ Responde con el número o nombre 👇`);
 
     await sendWhatsAppMessage(from, reply);
 
-    // DETECTAR PEDIDO COMPLETO
+    // MANEJAR CAMBIO DE RESTAURANTE
+    if (switchTarget) {
+      const tieneConversacion = session.messages.length > 2;
+
+      if (!tieneConversacion) {
+        // Sin pedido activo: cambiar de restaurante de inmediato
+        session.negocio = switchTarget;
+        session.messages = [];
+        session.pendingSwitch = null;
+        await sendWhatsAppMessage(from,
+          `✅ Te paso a *${switchTarget}* 😎\n¿Qué deseas ordenar?`
+        );
+      } else {
+        // Hay conversación activa: guardar el switch para después del pedido
+        session.pendingSwitch = switchTarget;
+      }
+    }
+
+    // DETECTAR PEDIDO COMPLETO Y ENVIAR A COCINA
     if (esPedidoCompleto(reply)) {
       const pedidoId = Date.now().toString();
       pedidos.set(pedidoId, {
@@ -256,6 +316,20 @@ Responde:
 CONFIRMAR ${pedidoId}
 LISTO ${pedidoId}`;
         await sendWhatsAppMessage(destino, mensaje);
+      }
+
+      // Si hay un cambio de restaurante pendiente, ejecutarlo ahora
+      if (session.pendingSwitch) {
+        const nuevoNegocio = session.pendingSwitch;
+        session.pendingSwitch = null;
+        session.negocio = nuevoNegocio;
+        session.messages = [];
+
+        await sendWhatsAppMessage(from,
+`✅ ¡Listo! Tu pedido quedó registrado 🙌
+Ahora te atiendo en *${nuevoNegocio}* 😎
+¿Qué deseas ordenar?`
+        );
       }
     }
 
