@@ -221,13 +221,20 @@
           "descripcion": "Trozos de pollo empanizado sin hueso, crujientes y perfectos para botanear. Con salsa a elegir. Los favoritos para compartir (o no)."
         }
       ],
-            "BEBIDAS": {
+      "EXTRAS": [
+        {
+          "nombre": "Papas",
+          "precio": 21,
+          "descripcion": "Papas fritas doradas y crujientes. El acompañamiento perfecto para cualquier orden."
+        }
+      ],
+      "BEBIDAS": {
         "LATTE (frío o caliente)": [
           { "nombre": "Chico", "precio": 60 },
           { "nombre": "Grande", "precio": 70 },
           { "nombre": "Jumbo", "precio": 79 }
         ],
-        "descripcion_latte": "Nuestros lattes están hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor sin costo extra.",
+        "descripcion_latte": "Lattes hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor sin costo extra.",
         "SABORES SIN COSTO EXTRA": [
           "Caramelo", "Vainilla", "Moka", "Chocolate Blanco",
           "Avellana", "Crema Irlandesa", "Tisana", "Tisana Golden",
@@ -253,15 +260,8 @@
           { "nombre": "Té de Cereza", "precio": 45 },
           { "nombre": "Americano de Arándano Grande", "precio": 50 },
           { "nombre": "Americano de Arándano Jumbo", "precio": 65 }
-   ]
-      },
-          "EXTRAS": [
-        {
-          "nombre": "Papas",
-          "precio": 21,
-          "descripcion": "Papas fritas doradas y crujientes. El acompañamiento perfecto para cualquier orden."
-        }
-      ]
+        ]
+      }
     }
   }
 }
