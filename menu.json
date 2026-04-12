@@ -90,7 +90,13 @@
           { "nombre": "Grande", "precio": 70 },
           { "nombre": "Jumbo", "precio": 79 }
         ],
-        "descripcion_latte": "Nuestros lattes están hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor sin costo extra.",
+        "descripcion_latte": "Nuestros lattes están hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor y tipo de leche sin costo extra (excepto leches vegetales).",
+        "TIPOS DE LECHE": [
+          { "nombre": "Entera", "precio_extra": 0 },
+          { "nombre": "Deslactosada", "precio_extra": 0 },
+          { "nombre": "Soya", "precio_extra": 5 },
+          { "nombre": "Almendra", "precio_extra": 8 }
+        ],
         "SABORES SIN COSTO EXTRA": [
           "Caramelo", "Vainilla", "Moka", "Chocolate Blanco",
           "Avellana", "Crema Irlandesa", "Tisana", "Tisana Golden",
@@ -234,7 +240,13 @@
           { "nombre": "Grande", "precio": 70 },
           { "nombre": "Jumbo", "precio": 79 }
         ],
-        "descripcion_latte": "Lattes hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor sin costo extra.",
+        "descripcion_latte": "Lattes hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor y tipo de leche sin costo extra (excepto leches vegetales).",
+        "TIPOS DE LECHE": [
+          { "nombre": "Entera", "precio_extra": 0 },
+          { "nombre": "Deslactosada", "precio_extra": 0 },
+          { "nombre": "Soya", "precio_extra": 5 },
+          { "nombre": "Almendra", "precio_extra": 8 }
+        ],
         "SABORES SIN COSTO EXTRA": [
           "Caramelo", "Vainilla", "Moka", "Chocolate Blanco",
           "Avellana", "Crema Irlandesa", "Tisana", "Tisana Golden",
