@@ -117,7 +117,7 @@ PEDIDOS:
 - Muestra subtotal
 - Agrega envío $30
 - Muestra TOTAL final
-- Pide nombre, dirección y teléfono
+- Pide nombre y número de teléfono (no pidas dirección)
 
 OBJETIVO:
 Vender y aumentar el ticket promedio.
