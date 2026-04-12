@@ -196,15 +196,31 @@ Responde con el número o nombre 👇`);
 ¿Te muestro el menú o deseas ordenar?`);
     }
 
-    // IA
+    // IA CON REINTENTO AUTOMÁTICO
     session.messages.push({ role: 'user', content: text });
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 300,
-      system: getSystemPrompt(session.negocio),
-      messages: session.messages
-    });
+    let response;
+    let intentos = 0;
+    const maxIntentos = 3;
+
+    while (intentos < maxIntentos) {
+      try {
+        response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 300,
+          system: getSystemPrompt(session.negocio),
+          messages: session.messages
+        });
+        break; // éxito, salir del loop
+      } catch (err) {
+        intentos++;
+        if (err.status === 529 && intentos < maxIntentos) {
+          await new Promise(r => setTimeout(r, 2000 * intentos)); // espera 2s, 4s...
+        } else {
+          throw err;
+        }
+      }
+    }
 
     const reply = response.content[0].text;
     session.messages.push({ role: 'assistant', content: reply });
@@ -245,6 +261,16 @@ LISTO ${pedidoId}`;
 
   } catch (err) {
     console.error('ERROR:', err.message);
+    if (err.status === 529) {
+      try {
+        const from = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.from;
+        if (from) {
+          await sendWhatsAppMessage(from,
+            '⏳ Estamos con mucha demanda en este momento, intenta de nuevo en unos segundos 🙏'
+          );
+        }
+      } catch (_) {}
+    }
   }
 });
 
