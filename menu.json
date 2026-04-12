@@ -1,0 +1,228 @@
+{
+  "Café El Punto": {
+    "categorias": {
+      "DESAYUNOS": [
+        {
+          "nombre": "Bowl de fruta",
+          "precio": 89,
+          "descripcion": "Fruta fresca de temporada cortada al momento, con granola artesanal crujiente, yogurt cremoso y un toque de miel. Fresco, ligero y delicioso."
+        },
+        {
+          "nombre": "Chilaquiles",
+          "precio": 140,
+          "descripcion": "Totopos recién hechos bañados en salsa roja o verde, cubiertos de crema, queso fresco y cebolla. Con pechuga de pollo deshebrada o 2 huevos al gusto. El desayuno clásico que nunca falla."
+        },
+        {
+          "nombre": "Huevos al gusto",
+          "precio": 139,
+          "descripcion": "Elige cómo los prefieres: a la mexicana, estrellados, revueltos, rancheros o en salsa verde. Servidos con frijoles de olla y tortillas calientitas."
+        },
+        {
+          "nombre": "Baguette El Punto",
+          "precio": 135,
+          "descripcion": "Pan baguette artesanal tostado y crujiente, relleno de jamón ahumado, queso derretido, lechuga, tomate y nuestro aderezo secreto. Una combinación perfecta."
+        },
+        {
+          "nombre": "Hotcakes",
+          "precio": 130,
+          "descripcion": "Esponjosos y doraditos, servidos con mantequilla derretida, miel de maple y fruta fresca. El desayuno dulce que te pone de buen humor."
+        },
+        {
+          "nombre": "Omelette",
+          "precio": 165,
+          "descripcion": "Huevo batido y suave por dentro, dorado por fuera, relleno de queso gratinado, jamón ahumado y champiñones salteados. Servido con pan tostado. Uno de nuestros favoritos."
+        }
+      ],
+      "COMIDAS": [
+        {
+          "nombre": "Pasta El Punto",
+          "precio": 160,
+          "descripcion": "Pasta al dente en nuestra salsa de la casa, cremosa y llena de sabor. Un platillo reconfortante que te deja con ganas de más."
+        },
+        {
+          "nombre": "Lasagna",
+          "precio": 195,
+          "descripcion": "Capas generosas de pasta fresca, carne molida jugosa, salsa boloñesa casera y queso derretido y gratinado al horno. Una lasagna de esas que recuerdas."
+        }
+      ],
+      "ENSALADAS": [
+        {
+          "nombre": "Ensalada El Punto",
+          "precio": 150,
+          "descripcion": "Mezcla de lechugas frescas, tomate cherry, pepino, zanahoria y crutones, con nuestro aderezo especial de la casa. Fresca, colorida y muy sabrosa."
+        },
+        {
+          "nombre": "Ensalada Verano",
+          "precio": 160,
+          "descripcion": "Ligera y refrescante con mezcla de lechugas, fruta fresca de temporada, queso de cabra y vinagreta de miel con mostaza. Para cuando quieres algo diferente."
+        }
+      ],
+      "PIZZAS": [
+        {
+          "nombre": "Pepperoni",
+          "precio": 160,
+          "descripcion": "Clásica y siempre ganadora. Base de salsa de tomate, queso mozzarella derretido y abundante pepperoni crujiente. Nunca decepciona."
+        },
+        {
+          "nombre": "Champiñón",
+          "precio": 165,
+          "descripcion": "Para los amantes de lo vegetariano. Queso mozzarella generoso, champiñones frescos salteados con ajo y hierbas finas. Sencilla pero adictiva."
+        },
+        {
+          "nombre": "Carnívora",
+          "precio": 190,
+          "descripcion": "Para los que no se conforman con poco. Cargada de pepperoni, jamón, tocino crujiente y salchicha sobre una base de queso derretido. Una pizza contundente."
+        },
+        {
+          "nombre": "Suprema",
+          "precio": 190,
+          "descripcion": "La más completa del menú. Pepperoni, pimiento, cebolla, champiñones, aceitunas y queso mozzarella. Una explosión de sabores en cada bocado."
+        },
+        {
+          "nombre": "Camarón",
+          "precio": 230,
+          "descripcion": "Nuestra pizza especial favorita. Camarones jugosos sobre base de queso mozzarella con salsa especial de ajo. Diferente, sofisticada y deliciosa."
+        }
+      ],
+      "BEBIDAS": {
+        "LATTE (frío o caliente)": [
+          { "nombre": "Chico", "precio": 60 },
+          { "nombre": "Grande", "precio": 70 },
+          { "nombre": "Jumbo", "precio": 79 }
+        ],
+        "descripcion_latte": "Nuestros lattes están hechos con espresso de alta calidad y leche perfectamente vaporizada. Elige tu sabor sin costo extra.",
+        "SABORES SIN COSTO EXTRA": [
+          "Caramelo", "Vainilla", "Moka", "Chocolate Blanco",
+          "Avellana", "Crema Irlandesa", "Tisana", "Tisana Golden",
+          "Honey", "Regular", "Lavanda",
+          "Fresa (solo frappe y malteada)",
+          "Frutos Rojos (solo frappe y malteada)"
+        ],
+        "EXTRAS DE SABOR": [
+          { "nombre": "Chai (cualquier sabor)", "precio_extra": 15 },
+          { "nombre": "Chai sucio", "precio_extra": 20 },
+          { "nombre": "Matcha", "precio_extra": 10 },
+          { "nombre": "Taro", "precio_extra": 10 },
+          { "nombre": "Vainilla SF", "precio_extra": 5 },
+          { "nombre": "Caramelo SF", "precio_extra": 5 }
+        ],
+        "OTRAS BEBIDAS": [
+          { "nombre": "Frappes", "precio": "75–89", "descripcion": "Cremosos y helados, perfectos para el calor. Disponibles en todos nuestros sabores." },
+          { "nombre": "Café americano", "precio": "30–40", "descripcion": "Espresso suave y largo. El clásico que nunca falla." },
+          { "nombre": "Limonadas", "precio": "40–45", "descripcion": "Frescas y naturales, perfectas para acompañar cualquier platillo." },
+          { "nombre": "Refrescos", "precio": 40 }
+        ]
+      },
+      "POSTRES": [
+        { "nombre": "Rebanada de pastel", "precio": 65, "descripcion": "Pastel del día, suave y esponjoso. Pregunta por el sabor disponible, ¡cambia seguido y siempre está delicioso!" },
+        { "nombre": "Galleta chispas", "precio": 15, "descripcion": "Galleta casera horneada con chispas de chocolate. Crujiente por fuera y suave por dentro. Ideal para acompañar tu café." },
+        { "nombre": "Pan Dulce", "precio": 35, "descripcion": "Pan dulce artesanal del día. Perfecto para consentirte con tu bebida favorita." }
+      ]
+    }
+  },
+
+  "Hambas Urban Food": {
+    "categorias": {
+      "HAMBURGUESAS": [
+        {
+          "nombre": "Cheese Burger",
+          "precio": 99,
+          "descripcion": "La clásica que nunca falla. Carne de res jugosa, queso americano derretido, lechuga fresca, tomate y cebolla. Simple, honesta y deliciosa."
+        },
+        {
+          "nombre": "Hambas Burger",
+          "precio": 109,
+          "descripcion": "Nuestra hamburguesa insignia. Carne de res con nuestra mezcla secreta de especias, queso, tocino crujiente y salsa de la casa. La que más se pide."
+        },
+        {
+          "nombre": "Honey Burger",
+          "precio": 119,
+          "descripcion": "El contraste perfecto entre lo dulce y lo salado. Carne jugosa, queso derretido, tocino y un toque de miel de abeja que lo cambia todo. Adictiva."
+        },
+        {
+          "nombre": "BBQ Spicy",
+          "precio": 119,
+          "descripcion": "Para los que les gusta el picante. Carne de res, queso, jalapeños crujientes y nuestra salsa BBQ ahumada con toque picoso. Nivel de fuego garantizado."
+        },
+        {
+          "nombre": "Crispy Burger",
+          "precio": 119,
+          "descripcion": "Pollo empanizado dorado y super crujiente, con lechuga fresca, tomate, queso y aderezo especial. Para los que prefieren pollo sin sacrificar el sabor."
+        },
+        {
+          "nombre": "Korean Chicken",
+          "precio": 129,
+          "descripcion": "Inspirada en la cocina coreana. Pollo crujiente bañado en salsa gochujang dulce y picante, con pepinillos y mayonesa de jengibre. Diferente, rica y muy trendy."
+        },
+        {
+          "nombre": "Noro Burger",
+          "precio": 149,
+          "descripcion": "La más imponente del menú. Doble carne, doble queso, tocino, cebolla caramelizada y nuestra salsa especial Noro. Para cuando tienes hambre de verdad."
+        }
+      ],
+      "ESPECIALES": [
+        {
+          "nombre": "Hamburguesa de carnitas + papas",
+          "precio": 139,
+          "descripcion": "Carnitas de cerdo jugosas y desmechadas sobre pan tostado con cebolla, cilantro y salsa verde. Viene con papas doradas. Un clásico mexicano en formato burger."
+        },
+        {
+          "nombre": "Papas de carnitas",
+          "precio": 139,
+          "descripcion": "Papas fritas crujientes cargadas de carnitas desmechadas, queso derretido, crema, jalapeños y salsa verde. El antojo perfecto para compartir o no."
+        },
+        {
+          "nombre": "Mal del Puerco (res + carnitas) + papas",
+          "precio": 180,
+          "descripcion": "El nombre lo dice todo. Carne de res Y carnitas de cerdo juntas en una sola burger monumental. Viene con papas. Para los que no se rinden fácilmente."
+        }
+      ],
+      "COMBOS Y EXTRAS": [
+        { "nombre": "Carne extra", "precio_extra": 30, "descripcion": "¿No fue suficiente? Agrega otra carne a tu burger." },
+        { "nombre": "Combo completo", "precio_extra": 81, "descripcion": "Agrega papas fritas + refresco + boneless a tu orden. La experiencia completa." },
+        { "nombre": "Combo antojo", "precio_extra": 51, "descripcion": "Agrega papas fritas + boneless. Para cuando quieres un poco más." }
+      ],
+      "BURRITOS": [
+        {
+          "nombre": "Bacon Cheese",
+          "precio": 99,
+          "descripcion": "Burrito bien cargado de tocino crujiente, queso derretido, frijoles y crema. Contundente y lleno de sabor."
+        },
+        {
+          "nombre": "Crispy Chicken",
+          "precio": 119,
+          "descripcion": "Pollo empanizado crujiente con lechuga, tomate, queso y aderezo especial enrollado en tortilla de harina. Crujiente en cada mordida."
+        },
+        {
+          "nombre": "Chicken Parmesano",
+          "precio": 119,
+          "descripcion": "Pollo a la parmesana con salsa de tomate, queso mozzarella derretido y albahaca. Inspiración italiana en formato burrito. Sorprendentemente bueno."
+        },
+        {
+          "nombre": "Burro Noro",
+          "precio": 119,
+          "descripcion": "Nuestro burrito especial con carne al pastor, piña, queso, cebolla y cilantro. Dulce, picoso y muy satisfactorio."
+        }
+      ],
+      "POLLO": [
+        {
+          "nombre": "Alitas",
+          "precio": 139,
+          "descripcion": "Alitas jugosas por dentro y doradas por fuera. Con salsa de tu elección: BBQ, búfalo, miel mostaza o al mojo de ajo. Difícil comer solo una."
+        },
+        {
+          "nombre": "Boneless",
+          "precio": 149,
+          "descripcion": "Trozos de pollo empanizado sin hueso, crujientes y perfectos para botanear. Con salsa a elegir. Los favoritos para compartir (o no)."
+        }
+      ],
+      "EXTRAS": [
+        {
+          "nombre": "Papas",
+          "precio": 21,
+          "descripcion": "Papas fritas doradas y crujientes. El acompañamiento perfecto para cualquier orden."
+        }
+      ]
+    }
+  }
+}
