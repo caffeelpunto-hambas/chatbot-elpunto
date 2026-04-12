@@ -111,6 +111,11 @@
           { "nombre": "Café americano", "precio": "30–40", "descripcion": "Espresso suave y largo. El clásico que nunca falla." },
           { "nombre": "Limonadas", "precio": "40–45", "descripcion": "Frescas y naturales, perfectas para acompañar cualquier platillo." },
           { "nombre": "Refrescos", "precio": 40 }
+          { "nombre": "Agua de Naranjita", "precio": 40 }
+          { "nombre": "Té Jazmin", "precio": 40 }
+          { "nombre": "Te de Cereza", "precio": 45 }
+          { "nombre": "Americano de Arandano Grande", "precio": 50 }
+          { "nombre": "Americano de Arandano Jumbo", "precio": 65 }
         ]
       },
       "POSTRES": [
