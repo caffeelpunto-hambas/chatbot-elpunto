@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const Anthropic = require('@anthropic-ai/sdk');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -10,158 +12,82 @@ const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
 // MEMORIA
 const conversations = new Map();
 const pedidos = new Map();
-const MENU_CAFE = `
-CAFÉ EL PUNTO
 
-DESAYUNOS:
-- Bowl de fruta — $89
-- Chilaquiles — $140 (pollo o 2 huevos)
-- Huevos al gusto — $139
-- Baguette El Punto — $135
-- Hotcakes — $130
-- Omelette — $165
+// CARGAR MENÚ DESDE menu.json
+function cargarMenu() {
+  const rutaMenu = path.join(__dirname, 'menu.json');
+  const raw = fs.readFileSync(rutaMenu, 'utf-8');
+  return JSON.parse(raw);
+}
 
-COMIDAS:
-- Pasta El Punto — $160
-- Lasagna — $195
+// FORMATEAR MENÚ PARA EL PROMPT
+function formatearMenu(negocio) {
+  const menus = cargarMenu();
+  const data = menus[negocio];
+  if (!data) return 'Menú no disponible.';
 
-ENSALADAS:
-- Ensalada El Punto — $150
-- Ensalada Verano — $160
+  let texto = `${negocio.toUpperCase()}\n`;
 
-PIZZAS:
-- Pepperoni — $160
-- Champiñón — $165
-- Carnívora — $190
-- Suprema — $190
-- Camarón — $230
+  for (const [categoria, items] of Object.entries(data.categorias)) {
+    texto += `\n${categoria}:\n`;
 
-BEBIDAS:
-
-LATTE (fríos o calientes):
-- Chico — $60
-- Grande — $70
-- Jumbo — $79
-
-EXTRAS DE SABOR:
-- Chai (cualquier sabor) +$15
-- Chai sucio +$20
-- Matcha +$10
-- Taro +$10
-- Vainilla SF +$5
-- Caramelo SF +$5
-
-OTRAS BEBIDAS:
-- Frappes $75–$89
-- Café americano $30–$40
-- Limonadas $40–$45
-- Refrescos $40
-
-Opciones de Sabores para bebidas sin costo extra (no aplica en cafe americano, limonadas o refrescos):
-- Caramelo
-- Vainilla
-- Moka
-- Chocolate Blanco
-- Avellana
-- Crema Irlandesa
-- Tisana
-- Tisana Golden
-- Honey
-- Regular
-- Lavanda
-- Fresa (Solo aplica en malteada y frappe)
-- Frutos Rojos (Solo aplica en malteada y frappe)
-
-Postres:
-- Rebanada de pastel $65
-- Galleta chispas $15
-- Pan Dulce $35
-`;
-const MENU_HAMBAS = `
-HAMBAS URBAN FOOD
-
-HAMBURGUESAS:
-- Cheese Burger — $99
-- Hambas Burger — $109
-- Honey Burger — $119
-- BBQ Spicy — $119
-- Crispy Burger — $119
-- Korean Chicken — $129
-- Noro Burger — $149
-
-🔥 ESPECIALES:
-- Hamburguesa de carnitas + papas — $139
-- Papas de carnitas — $139
-- Mal del Puerco (res + carnitas) + papas — $180
-
-EXTRAS:
-- Carne extra +$30
-
-COMBOS:
-- Combo completo +$81 (papas + refresco + boneless)
-- Combo antojo +$51 (papas + boneless)
-
-BURRITOS:
-- Bacon Cheese — $99
-- Crispy Chicken — $119
-- Chicken Parmesano — $119
-- Burro Noro — $119
-
-POLLO:
-- Alitas — $139
-- Boneless — $149
-
-EXTRAS:
-- Papas — $21
-`;
-// LIMPIAR SESIONES
-setInterval(() => {
-  const limite = Date.now() - 2 * 60 * 60 * 1000;
-
-  for (const [key, val] of conversations.entries()) {
-    if (val.lastActivity < limite) conversations.delete(key);
+    if (Array.isArray(items)) {
+      for (const item of items) {
+        if (item.precio_extra !== undefined) {
+          texto += `- ${item.nombre} +$${item.precio_extra}`;
+        } else {
+          texto += `- ${item.nombre} — $${item.precio}`;
+        }
+        if (item.descripcion) {
+          texto += `\n  (${item.descripcion})`;
+        }
+        texto += '\n';
+      }
+    } else if (typeof items === 'object') {
+      for (const [sub, subitems] of Object.entries(items)) {
+        if (sub === 'descripcion_latte') continue;
+        if (Array.isArray(subitems)) {
+          texto += `\n  ${sub}:\n`;
+          for (const item of subitems) {
+            if (typeof item === 'string') {
+              texto += `  - ${item}\n`;
+            } else if (item.precio_extra !== undefined) {
+              texto += `  - ${item.nombre} +$${item.precio_extra}\n`;
+            } else if (item.precio !== undefined) {
+              texto += `  - ${item.nombre} — $${item.precio}`;
+              if (item.descripcion) texto += ` (${item.descripcion})`;
+              texto += '\n';
+            }
+          }
+        }
+      }
+    }
   }
 
-  for (const [id, pedido] of pedidos.entries()) {
-    if (pedido.timestamp < limite) pedidos.delete(id);
-  }
-
-}, 30 * 60 * 1000);
+  return texto;
+}
 
 // PROMPT DINÁMICO
 function getSystemPrompt(negocio) {
-
-  let menu = '';
-
-  if (negocio === "Café El Punto") {
-    menu = MENU_CAFE;
-  }
-
-  if (negocio === "Hambas Urban Food") {
-    menu = MENU_HAMBAS;
-  }
-
+  const menu = formatearMenu(negocio);
   return `
 Eres el asistente de ${negocio}.
-
 HORARIO:
 7:00 AM a 10:30 PM
 Domicilio: +$30
-
 MENÚ:
 ${menu}
-
 REGLAS:
 - Responde en español
 - Sé breve (máx 5 líneas)
 - No inventes productos
-
+- Cuando describas un platillo, usa la descripción del menú para hacerlo sonar tentador
+- Si el cliente pregunta qué recomiendas, sugiere los platillos con descripción más atractiva
 VENTAS (IMPORTANTE):
 - Sugiere extras (carne, combos, bebidas)
 - Ofrece combos automáticamente
 - Recomienda productos relacionados
 - Siempre intenta cerrar la venta
-
 PEDIDOS:
 - Confirma cada producto con precio
 - Sugiere agregar combo o extras
@@ -169,28 +95,36 @@ PEDIDOS:
 - Agrega envío $30
 - Muestra TOTAL final
 - Pide nombre, dirección y teléfono
-
 OBJETIVO:
 Vender y aumentar el ticket promedio.
 `;
 }
+
+// LIMPIAR SESIONES VIEJAS
+setInterval(() => {
+  const limite = Date.now() - 2 * 60 * 60 * 1000;
+  for (const [key, val] of conversations.entries()) {
+    if (val.lastActivity < limite) conversations.delete(key);
+  }
+  for (const [id, pedido] of pedidos.entries()) {
+    if (pedido.timestamp < limite) pedidos.delete(id);
+  }
+}, 30 * 60 * 1000);
+
 // WEBHOOK VERIFY
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
-
   if (mode === 'subscribe' && token === process.env.WEBHOOK_VERIFY_TOKEN) {
     return res.status(200).send(challenge);
   }
-
   return res.sendStatus(403);
 });
 
 // WEBHOOK MENSAJES
 app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
-
   try {
     const message = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     if (!message || message.type !== 'text') return;
@@ -204,38 +138,31 @@ app.post('/webhook', async (req, res) => {
 
     const text = message.text.body.trim().toLowerCase();
 
-    // 🔥 MENSAJES DE COCINA
+    // MENSAJES DE COCINA
     if (
       from === process.env.CAFE_PHONE ||
       from === process.env.HAMBAS_PHONE
     ) {
-
       const partes = text.split(' ');
       const comando = partes[0];
       const pedidoId = partes[1];
-
       if (!pedidoId || !pedidos.has(pedidoId)) return;
-
       const pedido = pedidos.get(pedidoId);
 
       if (comando === 'confirmar') {
         pedido.estado = 'confirmado';
-
         await sendWhatsAppMessage(
           pedido.cliente,
           `✅ Tu pedido fue confirmado 👨‍🍳\n\nYa estamos preparándolo 🙌`
         );
       }
-
       if (comando === 'listo') {
         pedido.estado = 'listo';
-
         await sendWhatsAppMessage(
           pedido.cliente,
           `🍔 Tu pedido está listo 😎\n\n¡Gracias por tu compra! 🙌`
         );
       }
-
       return;
     }
 
@@ -247,13 +174,11 @@ app.post('/webhook', async (req, res) => {
         negocio: null
       });
     }
-
     const session = conversations.get(from);
     session.lastActivity = Date.now();
 
-    // 🔥 SELECCIÓN DE NEGOCIO
+    // SELECCIÓN DE NEGOCIO
     if (!session.negocio) {
-
       if (text.includes('cafe') || text === '1') {
         session.negocio = "Café El Punto";
       } else if (text.includes('hambas') || text === '2') {
@@ -261,18 +186,13 @@ app.post('/webhook', async (req, res) => {
       } else {
         return await sendWhatsAppMessage(from,
 `👋 ¡Hola! Bienvenido 🙌
-
 ¿Dónde deseas ordenar?
-
 1️⃣ Café El Punto ☕
 2️⃣ Hambas Urban Food 🍔
-
 Responde con el número o nombre 👇`);
       }
-
       return await sendWhatsAppMessage(from,
 `✅ Elegiste *${session.negocio}* 😎
-
 ¿Te muestro el menú o deseas ordenar?`);
     }
 
@@ -287,7 +207,6 @@ Responde con el número o nombre 👇`);
     });
 
     const reply = response.content[0].text;
-
     session.messages.push({ role: 'assistant', content: reply });
 
     if (session.messages.length > 20) {
@@ -296,11 +215,9 @@ Responde con el número o nombre 👇`);
 
     await sendWhatsAppMessage(from, reply);
 
-    // 🔥 DETECTAR PEDIDO
+    // DETECTAR PEDIDO COMPLETO
     if (esPedidoCompleto(reply)) {
-
       const pedidoId = Date.now().toString();
-
       pedidos.set(pedidoId, {
         cliente: from,
         negocio: session.negocio,
@@ -310,27 +227,18 @@ Responde con el número o nombre 👇`);
       });
 
       let destino = null;
-
-      if (session.negocio === "Café El Punto") {
-        destino = process.env.CAFE_PHONE;
-      }
-
-      if (session.negocio === "Hambas Urban Food") {
-        destino = process.env.HAMBAS_PHONE;
-      }
+      if (session.negocio === "Café El Punto") destino = process.env.CAFE_PHONE;
+      if (session.negocio === "Hambas Urban Food") destino = process.env.HAMBAS_PHONE;
 
       if (destino) {
         const mensaje = `🔥 NUEVO PEDIDO #${pedidoId}
-
 Cliente: +${from}
 ━━━━━━━━━━━━━━
 ${reply}
 ━━━━━━━━━━━━━━
-
 Responde:
 CONFIRMAR ${pedidoId}
 LISTO ${pedidoId}`;
-
         await sendWhatsAppMessage(destino, mensaje);
       }
     }
@@ -340,10 +248,9 @@ LISTO ${pedidoId}`;
   }
 });
 
-// ENVIAR MENSAJE
+// ENVIAR MENSAJE WHATSAPP
 async function sendWhatsAppMessage(to, text) {
   const phoneNumberId = process.env.PHONE_NUMBER_ID;
-
   const res = await fetch(`https://graph.facebook.com/v19.0/${phoneNumberId}/messages`, {
     method: 'POST',
     headers: {
@@ -357,18 +264,31 @@ async function sendWhatsAppMessage(to, text) {
       text: { body: text }
     })
   });
-
   if (!res.ok) {
     console.error(await res.json());
     throw new Error('Error enviando mensaje');
   }
 }
 
-// DETECTAR PEDIDO
+// DETECTAR PEDIDO COMPLETO
 function esPedidoCompleto(text) {
   return ['total', 'pedido', 'resumen']
     .some(p => text.toLowerCase().includes(p));
 }
+
+// ENDPOINT ADMIN — VER MENÚ EN VIVO
+app.get('/admin/menu', (req, res) => {
+  const token = req.query.token;
+  if (token !== process.env.ADMIN_TOKEN) {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
+  try {
+    const menu = cargarMenu();
+    res.json({ ok: true, menu });
+  } catch (e) {
+    res.status(500).json({ error: 'Error leyendo menu.json', detalle: e.message });
+  }
+});
 
 // ROOT
 app.get('/', (req, res) => {
