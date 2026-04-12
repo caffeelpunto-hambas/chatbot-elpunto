@@ -125,7 +125,7 @@
         ]
       },
       "POSTRES": [
-        { "nombre": "Rebanada de pastel", "precio": 65, "descripcion": "Pastel del día, suave y esponjoso. Pregunta por el sabor disponible, ¡cambia seguido y siempre está delicioso!" },
+        { "nombre": "Rebanada de pastel", "precio": 65, "descripcion": "Tenemos dos sabores disponibles: Cheesecake de zarzamora (cremoso y con toque frutal) y Chocolate con caramelo (intenso, dulce y adictivo). Preguntar al cliente cuál prefiere." },
         { "nombre": "Galleta chispas", "precio": 15, "descripcion": "Galleta casera horneada con chispas de chocolate. Crujiente por fuera y suave por dentro. Ideal para acompañar tu café." },
         { "nombre": "Pan Dulce", "precio": 35, "descripcion": "Pan dulce artesanal del día. Perfecto para consentirte con tu bebida favorita." }
       ]
