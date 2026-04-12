@@ -52,7 +52,8 @@ function formatearMenu(negocio) {
             if (typeof item === 'string') {
               texto += `  - ${item}\n`;
             } else if (item.precio_extra !== undefined) {
-              texto += `  - ${item.nombre} +$${item.precio_extra}\n`;
+              const extra = item.precio_extra === 0 ? 'sin costo extra' : `+$${item.precio_extra}`;
+              texto += `  - ${item.nombre} (${extra})\n`;
             } else if (item.precio !== undefined) {
               texto += `  - ${item.nombre} — $${item.precio}`;
               if (item.descripcion) texto += ` (${item.descripcion})`;
